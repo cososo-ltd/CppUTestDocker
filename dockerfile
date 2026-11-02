@@ -50,6 +50,33 @@ RUN git clone --depth 1 --branch clang_19 https://github.com/include-what-you-us
  && cmake --install build \
  && cd / && rm -rf /tmp/iwyu
 
+# wolfSSL, twice, for the SolidSyslog WolfSsl pack (E34). The pack compiles
+# against whatever build an integrator has, so CI proves it on two: one with
+# the options the pack asks for, and a bare ./configure baseline that is what
+# a default build gives. Both are the same pinned release, static libraries
+# only so nothing needs a loader path. The tag is annotated, so the SHA
+# checked is the commit it points at.
+ARG WOLFSSL_TAG=v5.9.4-stable
+ARG WOLFSSL_SHA=3c5eead44904df64e6a5a1f4ebdce377d35a849a
+WORKDIR /tmp/wolfssl
+RUN git clone --depth=1 --branch=${WOLFSSL_TAG} https://github.com/wolfSSL/wolfssl.git . \
+ && [ "$(git rev-parse HEAD)" = "${WOLFSSL_SHA}" ] \
+ && ./autogen.sh \
+ && ./configure --prefix=/opt/wolfssl-baseline --enable-static --disable-shared \
+      --disable-examples --disable-crypttests \
+ && make -j"$(nproc)" \
+ && make install \
+ && make distclean \
+ && ./configure --prefix=/opt/wolfssl --enable-static --disable-shared \
+      --disable-examples --disable-crypttests \
+      --enable-sni --enable-ip-alt-name \
+      CPPFLAGS="-DWOLFSSL_ALWAYS_VERIFY_CB -DKEEP_PEER_CERT" \
+ && make -j"$(nproc)" \
+ && make install \
+ && cd / && rm -rf /tmp/wolfssl
+ENV WOLFSSL_DIR=/opt/wolfssl
+ENV WOLFSSL_BASELINE_DIR=/opt/wolfssl-baseline
+
 ARG USERNAME=developer
 ARG USER_UID=1000
 ARG USER_GID=${USER_UID}
