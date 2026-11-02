@@ -13,6 +13,7 @@ A base Docker image for TDD development with GCC and [CppUTest](http://cpputest.
 - [GitHub CLI (`gh`)](https://cli.github.com/)
 - [James Grenning's legacy-build toolkit](https://github.com/jwgrenning/legacy-build)
 - autoconf, automake, libtool
+- wolfSSL v5.9.4-stable, built twice as static libraries: `/opt/wolfssl` (`WOLFSSL_DIR`) with SNI, iPAddress matching, `WOLFSSL_ALWAYS_VERIFY_CB` and `KEEP_PEER_CERT`; `/opt/wolfssl-baseline` (`WOLFSSL_BASELINE_DIR`) from a bare `./configure`
 
 ## Usage
 
