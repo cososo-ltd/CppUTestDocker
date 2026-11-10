@@ -55,7 +55,10 @@ RUN git clone --depth 1 --branch clang_19 https://github.com/include-what-you-us
 # the options the pack asks for, and a bare ./configure baseline that is what
 # a default build gives. Both are the same pinned release, static libraries
 # only so nothing needs a loader path. The tag is annotated, so the SHA
-# checked is the commit it points at.
+# checked is the commit it points at. The "# renovate:" comment is read by
+# Renovate (renovate.json), which opens a pull request moving the tag and the
+# SHA together when wolfSSL releases; see README.md.
+# renovate: datasource=git-tags packageName=https://github.com/wolfSSL/wolfssl.git versioning=regex:^v(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-stable$
 ARG WOLFSSL_TAG=v5.9.4-stable
 ARG WOLFSSL_SHA=3c5eead44904df64e6a5a1f4ebdce377d35a849a
 WORKDIR /tmp/wolfssl
