@@ -32,7 +32,14 @@ pre-release and would offer nothing.
 
 A new major version does not open a pull request. It is listed on the
 Dependency Dashboard issue, and opens one only when ticked there: under
-SolidSyslog's support statement a new major is platform work, not a bump.
+SolidSyslog's support statement a new major is platform work, not a bump. A
+dashboard entry means no decision has been recorded yet; once the epic
+exists, an `allowedVersions` rule in `renovate.json` names it and the entry
+goes.
+
+CodeRabbit skips a Renovate pull request (`.coderabbit.yaml`): the build on
+the pull request is the check. If a bump needed a hand-pushed change to
+build, ask for the review with a `@coderabbitai review` comment.
 
 The images layered on this one carry the same wolfSSL release as source, so a
 bump here is followed by one there.
