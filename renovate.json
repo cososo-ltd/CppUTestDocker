@@ -1,0 +1,35 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Bumps the wolfSSL tag+SHA pin in dockerfile. The pin carries a '# renovate:' comment naming its datasource, repository and versioning; see README.md.",
+  "enabledManagers": [
+    "custom.regex"
+  ],
+  "dependencyDashboard": true,
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": null,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "A '# renovate:' comment followed by the ARG <NAME>_TAG and ARG <NAME>_SHA pair it describes.",
+      "managerFilePatterns": [
+        "/^dockerfile$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) packageName=(?<packageName>\\S+)(?: versioning=(?<versioning>\\S+))?\\nARG (?<depName>\\w+)_TAG=(?<currentValue>\\S+)\\nARG \\w+_SHA=(?<currentDigest>[0-9a-f]{40})\\n"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "A major is platform work, not a bump (SUPPORT.md in solid-syslog): it waits on the Dependency Dashboard until someone ticks it.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "dependencyDashboardApproval": true
+    }
+  ]
+}
