@@ -65,6 +65,7 @@ jobs:
           private-key: ${{ secrets.RELEASE_PLEASE_PRIVATE_KEY }}
           owner: cososo-ltd
           repositories: solid-syslog
+          permission-contents: write
 
       - name: Send image-published to solid-syslog
         env:
