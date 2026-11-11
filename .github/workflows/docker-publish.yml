@@ -49,3 +49,29 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+  # Tells solid-syslog the image is published, so its Image Bump workflow opens
+  # the pull request that moves every reference onto the new digest and runs
+  # CI on it. The token is minted from the release GitHub App for solid-syslog,
+  # where the App is installed; this repository holds only the App's ID and key.
+  notify:
+    needs: build-and-push
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        id: app-token
+        with:
+          app-id: ${{ secrets.RELEASE_PLEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_PLEASE_PRIVATE_KEY }}
+          owner: cososo-ltd
+          repositories: solid-syslog
+          permission-contents: write
+
+      - name: Send image-published to solid-syslog
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh api repos/cososo-ltd/solid-syslog/dispatches \
+            -f event_type=image-published \
+            -f 'client_payload[images]=cpputest' \
+            -f "client_payload[tag]=sha-$(echo "$GITHUB_SHA" | cut -c1-7)"

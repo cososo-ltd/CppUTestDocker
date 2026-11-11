@@ -72,6 +72,15 @@ docker run -v <path>:/home/src ghcr.io/davidcozens/cpputest:sha-<commit-sha> mak
 
 The image is built and pushed to the [GitHub Container Registry](https://ghcr.io) automatically on each push to the `main` branch.
 
+Once it is pushed, the workflow sends an `image-published` event to
+[solid-syslog](https://github.com/cososo-ltd/solid-syslog), whose Image Bump
+workflow opens the pull request that moves every reference onto the new digest
+and runs CI on it. The event is sent with a token minted from the release
+GitHub App for solid-syslog, from the `RELEASE_PLEASE_APP_ID` and
+`RELEASE_PLEASE_PRIVATE_KEY` organisation secrets; the App itself is not
+installed here. The images layered on this one pin it by digest and Renovate
+moves that pin, so a push here is followed by a bump there.
+
 To build locally:
 
 ```
