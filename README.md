@@ -62,6 +62,11 @@ is a GitHub notification:
   a pull request cannot exercise for the login, push and notify steps that run
   only on `main`.
 
+A publish that fails on `main` after a green pull request sends no event, so
+no bump pull request opens. solid-syslog's weekly Image Drift workflow is the
+alarm for that: it fails when a pin there lags this repository's `main` with
+no bump pull request to carry it.
+
 ## The smoke
 
 The publishing workflow builds the image into the runner's Docker and runs
