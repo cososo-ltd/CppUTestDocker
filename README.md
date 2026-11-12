@@ -15,12 +15,13 @@ A base Docker image for TDD development with GCC and [CppUTest](http://cpputest.
 - autoconf, automake, libtool
 - wolfSSL at the release `dockerfile` pins, built twice as static libraries: `/opt/wolfssl` (`WOLFSSL_DIR`) with SNI, iPAddress matching, `WOLFSSL_ALWAYS_VERIFY_CB` and `KEEP_PEER_CERT`; `/opt/wolfssl-baseline` (`WOLFSSL_BASELINE_DIR`) from a bare `./configure`
 
-## Keeping the wolfSSL pin current
+## Keeping the pins current
 
 [Renovate](https://docs.renovatebot.com/), installed on the organisation as
 the Mend GitHub App, opens a pull request when wolfSSL publishes a patch or
-minor release, moving `WOLFSSL_TAG` and `WOLFSSL_SHA` together. The
-publishing workflow builds the image on that pull request and smokes it (see
+minor release, moving `WOLFSSL_TAG` and `WOLFSSL_SHA` together. It does the
+same for the digest the `FROM` line pins `debian:bookworm-slim` at, and for
+the SHA-pinned actions in the publishing workflow. The publishing workflow builds the image on that pull request and smokes it (see
 below), so a release that no longer clones, gates, builds or links fails
 there. `renovate.json` holds the configuration.
 
@@ -30,7 +31,7 @@ the commit the `git rev-parse HEAD` gate compares, the clone URL, and a regex
 versioning, because Renovate's default reads the `-stable` suffix as a
 pre-release and would offer nothing.
 
-A new major version does not open a pull request. It is listed on the
+A new wolfSSL major does not open a pull request. It is listed on the
 Dependency Dashboard issue, and opens one only when ticked there: under
 SolidSyslog's support statement a new major is platform work, not a bump. A
 dashboard entry means no decision has been recorded yet; once the epic
@@ -43,6 +44,23 @@ build, ask for the review with a `@coderabbitai review` comment.
 
 The images layered on this one carry the same wolfSSL release as source, so a
 bump here is followed by one there.
+
+## What merges itself
+
+A Renovate pull request whose `build-and-push` check passes, smoke included,
+merges itself: `renovate.json` sets `automerge`, and branch protection on
+`main` requires that check, so GitHub's auto-merge waits for it. The publish
+that follows sends solid-syslog its bump pull request, and that one is merged
+by hand there. Nobody needs to look at this repository while bumps are green.
+
+Two kinds of pull request come to the maintainer instead, by assignment, which
+is a GitHub notification:
+
+- one whose checks fail - Renovate assigns an automerge pull request only then;
+- a major of anything, which never merges itself. An upstream major is
+  platform work, and a GitHub Action's major is where its inputs change, which
+  a pull request cannot exercise for the login, push and notify steps that run
+  only on `main`.
 
 ## The smoke
 

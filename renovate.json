@@ -1,10 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Bumps the wolfSSL tag+SHA pin in dockerfile. The pin carries a '# renovate:' comment naming its datasource, repository and versioning; see README.md.",
+  "description": "Bumps the wolfSSL tag+SHA pin in dockerfile, the digest of its Debian base, and the SHA-pinned actions in the publish workflow. A green pull request merges itself; see README.md.",
   "enabledManagers": [
-    "custom.regex"
+    "custom.regex",
+    "dockerfile",
+    "github-actions"
   ],
   "dependencyDashboard": true,
+  "automerge": true,
+  "automergeType": "pr",
+  "assignees": [
+    "DavidCozens"
+  ],
   "semanticCommits": "enabled",
   "semanticCommitType": "chore",
   "semanticCommitScope": null,
@@ -30,6 +37,29 @@
         "major"
       ],
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "A major never merges itself. An upstream major is platform work (SUPPORT.md in solid-syslog), and a GitHub Action's major is where its inputs change, which a pull request cannot exercise for the login, push and notify steps that run only on main. Renovate assigns the pull request to the maintainer when it opens.",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "The Debian base is named by its tag and pinned by digest, so a refreshed bookworm-slim is a digest update that rebuilds the image on it.",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchDepNames": [
+        "debian"
+      ],
+      "pinDigests": true,
+      "commitMessageTopic": "the Debian base"
     }
-  ]
+  ],
+  "dockerfile": {
+    "managerFilePatterns": [
+      "/^dockerfile$/"
+    ]
+  }
 }
