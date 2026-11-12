@@ -4,7 +4,7 @@ A base Docker image for TDD development with GCC and [CppUTest](http://cpputest.
 
 ## Contents
 
-- GCC and G++ from Debian bookworm (the `debian:bookworm-slim` base image)
+- GCC and G++ from Debian trixie (the `debian:trixie-slim` base image)
 - CppUTest v4.0
 - CMake
 - cppcheck
@@ -20,7 +20,7 @@ A base Docker image for TDD development with GCC and [CppUTest](http://cpputest.
 [Renovate](https://docs.renovatebot.com/), installed on the organisation as
 the Mend GitHub App, opens a pull request when wolfSSL publishes a patch or
 minor release, moving `WOLFSSL_TAG` and `WOLFSSL_SHA` together. It does the
-same for the digest the `FROM` line pins `debian:bookworm-slim` at, and for
+same for the digest the `FROM` line pins `debian:trixie-slim` at, and for
 the SHA-pinned actions in the publishing workflow. The publishing workflow builds the image on that pull request and smokes it (see
 below), so a release that no longer clones, gates, builds or links fails
 there. `renovate.json` holds the configuration.
