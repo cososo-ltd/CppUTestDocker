@@ -1,15 +1,11 @@
-FROM debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
+FROM debian:trixie-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
 LABEL Description="Image for running CppUTest"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Add LLVM and GitHub CLI apt repositories
+# Clang 19 comes from Debian itself; only the GitHub CLI needs a repository.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl gnupg wget \
-    && wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key \
-        | gpg --dearmor > /usr/share/keyrings/llvm-archive-keyring.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/llvm-archive-keyring.gpg] http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-19 main" \
-        > /etc/apt/sources.list.d/llvm.list \
     && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
         | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -18,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    autoconf automake clang-19 clang-format-19 clang-tidy-19 cmake cppcheck g++ gcc gdb gh git lcov libclang-19-dev libssl-dev libtool llvm-19-dev make openssh-client sudo zlib1g-dev \
+    autoconf automake clang-19 clang-format-19 clang-tidy-19 cmake cppcheck g++ gcc gdb gh git lcov libclang-19-dev libjson-xs-perl libssl-dev libtool llvm-19-dev make openssh-client sudo zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set clang-format-19 and clang-tidy-19 as defaults

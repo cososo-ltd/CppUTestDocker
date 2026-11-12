@@ -46,7 +46,7 @@
       "automerge": false
     },
     {
-      "description": "The Debian base is named by its tag and pinned by digest, so a refreshed bookworm-slim is a digest update that rebuilds the image on it.",
+      "description": "The Debian base is named by its tag and pinned by digest, so a refreshed trixie-slim is a digest update that rebuilds the image on it.",
       "matchDatasources": [
         "docker"
       ],
