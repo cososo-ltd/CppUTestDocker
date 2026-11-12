@@ -4,7 +4,7 @@ A base Docker image for TDD development with GCC and [CppUTest](http://cpputest.
 
 ## Contents
 
-- GCC 14 (via the official `gcc:14` base image)
+- GCC and G++ from Debian bookworm (the `debian:bookworm-slim` base image)
 - CppUTest v4.0
 - CMake
 - cppcheck
@@ -20,9 +20,9 @@ A base Docker image for TDD development with GCC and [CppUTest](http://cpputest.
 [Renovate](https://docs.renovatebot.com/), installed on the organisation as
 the Mend GitHub App, opens a pull request when wolfSSL publishes a patch or
 minor release, moving `WOLFSSL_TAG` and `WOLFSSL_SHA` together. The
-publishing workflow builds the image on that pull request, so a release that
-no longer clones, gates or builds cleanly fails there. `renovate.json` holds
-the configuration.
+publishing workflow builds the image on that pull request and smokes it (see
+below), so a release that no longer clones, gates, builds or links fails
+there. `renovate.json` holds the configuration.
 
 Renovate finds the pin by the `# renovate:` comment immediately above the
 pair. It names the `git-tags` datasource, which resolves the annotated tag to
@@ -44,28 +44,43 @@ build, ask for the review with a `@coderabbitai review` comment.
 The images layered on this one carry the same wolfSSL release as source, so a
 bump here is followed by one there.
 
+## The smoke
+
+The publishing workflow builds the image into the runner's Docker and runs
+`smoke/smoke.sh` inside it before anything is pushed, on pull requests and on
+`main` alike. It checks what a bump can change, not any project built on the
+image:
+
+- every tool listed above answers `--version`;
+- CppUTest builds, links and runs a one-test executable from `CPPUTEST_HOME`;
+- each wolfSSL build, `WOLFSSL_DIR` and `WOLFSSL_BASELINE_DIR`, links a program
+  whose header and library both report the release `WOLFSSL_TAG` names.
+
+Whether a project still compiles against a new release is that project's own
+CI's question, asked by the bump pull request the publish sends it.
+
 ## Usage
 
 Pull the image from the GitHub Container Registry:
 
 ```
-docker pull ghcr.io/davidcozens/cpputest:latest
+docker pull ghcr.io/cososo-ltd/cpputest:latest
 ```
 
 Run tests by mounting your project directory (containing your `CMakeLists.txt` or `Makefile`) to `/home/src`:
 
 ```
-docker run -v <path>:/home/src ghcr.io/davidcozens/cpputest make
+docker run -v <path>:/home/src ghcr.io/cososo-ltd/cpputest make
 ```
 
 Where `<path>` is the fully qualified path to your project folder.
 
 The `CPPUTEST_HOME` environment variable is set to `/home/cpputest` inside the container.
 
-For production use and traceability, prefer a specific SHA tag over `latest`. Each build is tagged with the commit SHA it was built from (e.g. `sha-abc1234`). Available tags can be found on the [package page](https://github.com/davidcozens/CppUTestDocker/pkgs/container/cpputest):
+For production use and traceability, prefer a specific SHA tag over `latest`. Each build is tagged with the commit SHA it was built from (e.g. `sha-abc1234`). Available tags can be found on the [package page](https://github.com/cososo-ltd/CppUTestDocker/pkgs/container/cpputest):
 
 ```
-docker run -v <path>:/home/src ghcr.io/davidcozens/cpputest:sha-<commit-sha> make
+docker run -v <path>:/home/src ghcr.io/cososo-ltd/cpputest:sha-<commit-sha> make
 ```
 
 ## Building
